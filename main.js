@@ -1,3 +1,5 @@
+import html2pdf from 'html2pdf.js';
+
 const QUIZ_URL   = "escorpiao.html";
 const KIWIFY_URL = "https://pay.kiwify.com.br/SEU-CHECKOUT";
 document.querySelectorAll('.js-buy').forEach(a=>a.setAttribute('href', QUIZ_URL));
@@ -43,3 +45,33 @@ if('IntersectionObserver' in window){
   const io=new IntersectionObserver((es)=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}});},{threshold:.12});
   document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
 }else{document.querySelectorAll('.reveal').forEach(el=>el.classList.add('in'));}
+
+/* ===== PDF Generation ===== */
+const btnPdf = document.getElementById('btn-baixar-laudo');
+if (btnPdf) {
+  btnPdf.addEventListener('click', (e) => {
+    e.preventDefault();
+    const btnOriginalText = btnPdf.innerText;
+    btnPdf.innerText = "⏳ Gerando...";
+    
+    const elementoParaPDF = document.getElementById('pdf-content');
+    elementoParaPDF.style.display = 'block';
+
+    const opcoes = {
+      margin:       10,
+      filename:     'Meu_Laudo_EscorpiaoSafe.pdf',
+      image:        { type: 'jpeg', quality: 0.98 },
+      html2canvas:  { scale: 2 },
+      jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+
+    html2pdf().set(opcoes).from(elementoParaPDF).save().then(() => {
+      elementoParaPDF.style.display = 'none';
+      btnPdf.innerText = btnOriginalText;
+    }).catch(err => {
+      console.error(err);
+      elementoParaPDF.style.display = 'none';
+      btnPdf.innerText = "Erro ao gerar PDF";
+    });
+  });
+}

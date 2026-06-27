@@ -9,72 +9,88 @@
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@600;700;800;900&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="./style.css" />
 <style>
-  /* Base Styles */
-  body { background: #f5f5f5; }
-  .quiz-container { max-width: 800px; margin: 40px auto; padding: 30px; background: #fff; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); color: #111; }
-  .progress-bar { width: 100%; height: 10px; background: #eee; border-radius: 5px; margin-bottom: 20px; overflow: hidden; }
-  .progress-fill { height: 100%; background: #FF5A4D; width: 0%; transition: width 0.4s ease; }
-  .block-title { font-family: 'Archivo', sans-serif; font-size: 28px; margin-bottom: 5px; color: #14110C; }
-  .block-desc { font-family: 'Inter', sans-serif; font-size: 14px; color: #666; margin-bottom: 30px; }
+  /* Base Styles (Dark Theme overrides for Quiz UI) */
+  body { background: var(--bg-main); color: var(--text-main); }
+  .quiz-container { max-width: 800px; margin: 40px auto; padding: 40px; background: var(--bg-card); border-radius: 12px; border: 1px solid var(--border-subtle); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+  
+  .progress-bar { width: 100%; height: 8px; background: var(--bg-main); border-radius: 4px; margin-bottom: 30px; overflow: hidden; border: 1px solid var(--border-subtle);}
+  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--risk-orange), var(--risk-red)); width: 0%; transition: width 0.4s ease; box-shadow: 0 0 10px var(--glow-red);}
+  
+  .block-title { font-family: 'Archivo', sans-serif; font-size: 28px; margin-bottom: 10px; color: #fff; }
+  .block-desc { font-family: 'Inter', sans-serif; font-size: 15px; color: var(--text-sec); margin-bottom: 40px; }
   
   /* Question Styles */
-  .question-box { margin-bottom: 40px; padding-bottom: 20px; border-bottom: 1px solid #f0f0f0; }
+  .question-box { margin-bottom: 40px; padding-bottom: 30px; border-bottom: 1px solid var(--border-subtle); }
   .question-box:last-child { border-bottom: none; }
-  .q-title { font-family: 'Archivo', sans-serif; font-size: 18px; margin-bottom: 15px; color: #2c2820; }
-  .q-options { display: grid; gap: 12px; grid-template-columns: 1fr; }
+  .q-title { font-family: 'Archivo', sans-serif; font-size: 20px; margin-bottom: 20px; color: #fff; }
+  .q-options { display: grid; gap: 15px; grid-template-columns: 1fr; }
   
-  .q-opt { padding: 16px; border: 2px solid #eee; border-radius: 8px; cursor: pointer; font-family: 'Inter', sans-serif; font-weight: 500; transition: all 0.2s; text-align: left; background: #fff; display: flex; align-items: center; justify-content: space-between;}
-  .q-opt:hover { border-color: #ffd2ce; background: #fffaf9; }
-  .q-opt.selected { border-color: #FF5A4D; background: #fdf3f2; box-shadow: 0 2px 8px rgba(255,90,77,0.15); }
+  .q-opt { padding: 18px 20px; border: 2px solid var(--border-subtle); border-radius: 8px; cursor: pointer; font-family: 'Inter', sans-serif; font-weight: 500; transition: all 0.2s; text-align: left; background: var(--bg-main); color: var(--text-sec); display: flex; align-items: center; justify-content: space-between;}
+  .q-opt:hover { border-color: var(--text-sec); color: #fff; }
+  .q-opt.selected { border-color: var(--risk-orange); background: rgba(249, 115, 22, 0.05); color: #fff; box-shadow: 0 0 15px rgba(249, 115, 22, 0.1); }
   
   /* Navigation */
-  .nav-buttons { display: flex; justify-content: space-between; margin-top: 30px; }
-  .btn-nav { padding: 16px 30px; font-family: 'Archivo', sans-serif; font-weight: bold; font-size: 16px; border-radius: 8px; cursor: pointer; border: none; transition: 0.2s; }
-  .btn-prev { background: #eee; color: #333; }
-  .btn-prev:hover { background: #e0e0e0; }
-  .btn-next { background: #2c2820; color: #fff; flex: 1; margin-left: 15px; }
-  .btn-next:hover { background: #14110C; }
-  .btn-next:disabled { background: #ccc; cursor: not-allowed; }
+  .nav-buttons { display: flex; justify-content: space-between; margin-top: 40px; }
+  .btn-nav { padding: 18px 30px; font-family: 'Archivo', sans-serif; font-weight: bold; font-size: 16px; border-radius: 8px; cursor: pointer; border: none; transition: 0.2s; }
+  .btn-prev { background: transparent; border: 1px solid var(--border-subtle); color: var(--text-sec); }
+  .btn-prev:hover { background: var(--border-subtle); color: #fff; }
+  .btn-next { background: linear-gradient(135deg, var(--risk-orange), var(--risk-red)); color: #fff; flex: 1; margin-left: 20px; box-shadow: 0 4px 15px var(--glow-red); }
+  .btn-next:hover { transform: translateY(-2px); box-shadow: 0 6px 20px var(--glow-red); }
+  .btn-next:disabled { background: var(--border-subtle); color: var(--text-sec); cursor: not-allowed; box-shadow: none; transform: none; }
   
   /* PDF Styles (Hidden in Browser) */
-  #pdf-wrapper { display: none; } /* Kept completely out of flow until render */
-  .pdf-page { width: 800px; padding: 40px; font-family: 'Inter', sans-serif; background: #fff; color: #2c2820; box-sizing: border-box; page-break-after: always; position: relative;}
+  #pdf-wrapper { display: none; }
+  /* O PDF base será forçado branco para as páginas de conteúdo (impressão econômica) */
+  .pdf-page { width: 800px; padding: 40px; font-family: 'Inter', sans-serif; background: #fff; color: #111; box-sizing: border-box; page-break-after: always; position: relative;}
   .pdf-page:last-child { page-break-after: auto; }
-  .pdf-header { border-bottom: 4px solid #FF5A4D; padding-bottom: 20px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: flex-end;}
-  .pdf-title { font-family: 'Anton', sans-serif; font-size: 38px; margin: 0; color: #2c2820; line-height: 1.1; }
-  .pdf-sub { margin: 5px 0 0; color: #666; font-size: 16px; font-weight: 500;}
-  .pdf-meta { text-align: right; font-size: 12px; color: #888; }
   
-  .pdf-h2 { font-family: 'Archivo', sans-serif; font-size: 24px; color: #14110C; margin-bottom: 20px; border-bottom: 2px solid #eee; padding-bottom: 10px;}
-  .pdf-h3 { font-family: 'Archivo', sans-serif; font-size: 18px; color: #FF5A4D; margin-top: 25px; margin-bottom: 10px;}
+  /* OVERRIDE: Página 1 (Capa) será Dark Premium! */
+  #page-1 { background: #0B0F14; color: #F9FAFB; }
   
-  .risk-card { padding: 25px; border-radius: 12px; border-left: 8px solid #ccc; background: #f9f9f9; margin-bottom: 30px; display: flex; align-items: center; justify-content: space-between;}
-  .risk-score { font-family: 'Anton', sans-serif; font-size: 64px; margin: 0; line-height: 1; }
-  .risk-level { font-family: 'Archivo', sans-serif; font-size: 24px; font-weight: 900; text-transform: uppercase; margin-bottom: 5px;}
+  .pdf-header { border-bottom: 4px solid #EF4444; padding-bottom: 20px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: flex-end;}
+  .pdf-title { font-family: 'Anton', sans-serif; font-size: 42px; margin: 0; color: inherit; line-height: 1.1; letter-spacing: 1px;}
+  .pdf-sub { margin: 5px 0 0; color: #9CA3AF; font-size: 16px; font-weight: 500;}
+  .pdf-meta { text-align: right; font-size: 12px; color: #6B7280; font-family: 'Space Mono', monospace; }
+  
+  .pdf-h2 { font-family: 'Archivo', sans-serif; font-size: 26px; color: inherit; margin-bottom: 20px; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;}
+  #page-1 .pdf-h2 { border-bottom-color: #1F2937; } /* Borda escura na capa */
+  
+  .pdf-h3 { font-family: 'Archivo', sans-serif; font-size: 18px; color: #EF4444; margin-top: 25px; margin-bottom: 10px;}
+  
+  /* Risk Card na Capa (Dark) */
+  .risk-card { padding: 30px; border-radius: 12px; border-left: 8px solid #ccc; background: #111827; margin-bottom: 40px; display: flex; align-items: center; justify-content: space-between; border-right: 1px solid #1F2937; border-top: 1px solid #1F2937; border-bottom: 1px solid #1F2937;}
+  .risk-score { font-family: 'Anton', sans-serif; font-size: 72px; margin: 0; line-height: 1; }
+  .risk-level { font-family: 'Archivo', sans-serif; font-size: 28px; font-weight: 900; text-transform: uppercase; margin-bottom: 8px;}
   
   .pdf-ul { list-style: none; padding: 0; margin: 0; }
-  .pdf-li { padding: 12px 0; border-bottom: 1px solid #eee; font-size: 14px; line-height: 1.5; }
-  .pdf-li strong { color: #14110C; }
+  .pdf-li { padding: 12px 0; border-bottom: 1px solid #e5e7eb; font-size: 14px; line-height: 1.6; }
+  #page-1 .pdf-li { border-bottom-color: #1F2937; color: #D1D5DB; }
+  #page-1 .pdf-li strong { color: #fff; }
   
-  .room-card { background: #fdfdfd; border: 1px solid #eee; border-radius: 8px; padding: 15px; margin-bottom: 15px; }
-  .room-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 10px;}
-  .room-name { font-family: 'Archivo', sans-serif; font-size: 18px; font-weight: bold; margin:0;}
-  .room-badge { padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: bold; color: #fff;}
+  /* Room Cards (Páginas Claras) */
+  .room-card { background: #fdfdfd; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; margin-bottom: 20px; }
+  .room-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e5e7eb; padding-bottom: 10px; margin-bottom: 12px;}
+  .room-name { font-family: 'Archivo', sans-serif; font-size: 18px; font-weight: bold; margin:0; color: #111;}
+  .room-badge { padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; color: #fff; font-family: 'Archivo', sans-serif; text-transform: uppercase;}
   
-  /* SVG Heatmap styling */
-  .heatmap-svg { width: 100%; height: auto; max-height: 450px; display: block; margin: 0 auto; border: 2px solid #eee; border-radius: 8px; background: #fafafa;}
-  .svg-room { transition: fill 0.3s; stroke: #2c2820; stroke-width: 2; }
-  .svg-label { font-family: 'Archivo', sans-serif; font-size: 18px; font-weight: bold; fill: #111; pointer-events: none; }
+  /* SVG Heatmap styling (Página Clara) */
+  .heatmap-svg { width: 100%; height: auto; max-height: 450px; display: block; margin: 0 auto; border: 1px solid #e5e7eb; border-radius: 12px; background: #f9fafb;}
+  .svg-room { transition: fill 0.3s; stroke: #374151; stroke-width: 2; }
+  .svg-label { font-family: 'Archivo', sans-serif; font-size: 18px; font-weight: bold; fill: #fff; pointer-events: none; }
   
-  .pdf-footer { position: absolute; bottom: 20px; left: 40px; right: 40px; text-align: center; font-size: 10px; color: #999; border-top: 1px solid #eee; padding-top: 15px;}
+  .pdf-footer { position: absolute; bottom: 20px; left: 40px; right: 40px; text-align: center; font-size: 10px; color: #9CA3AF; border-top: 1px solid #e5e7eb; padding-top: 15px;}
+  #page-1 .pdf-footer { border-top-color: #1F2937; color: #4B5563; }
 </style>
 </head>
 <body>
 
 <div class="topbar">
   <div class="brand">
-    <span class="dot"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l3 1M3 13l3-1"/><path d="M6 10l2.5 1.5L6 13"/><path d="M8.5 11.5h6"/><path d="M14.5 11.5c2 0 3-1 4-2.2"/><path d="M18.5 9.3c1.6-.4 2.2 1 1.4 2.3-.6 1-2 1.2-2 1.2"/><path d="M9.5 12l-.8 3M11.5 12l-.2 3M13.5 12l.6 3"/></svg></span>
-    <div>EscorpiãoSafe<br><small>Diagnóstico Residencial Avançado</small></div>
+    <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+      <path d="M12 8v4M12 16h.01"/>
+    </svg>
+    <div>Escorpião<span style="color:var(--text-main)">Safe</span><br><small>SCANNER RESIDENCIAL</small></div>
   </div>
 </div>
 
@@ -98,76 +114,81 @@
 =========================================== -->
 <div id="pdf-wrapper">
   
-  <!-- PÁGINA 1: RESUMO EXECUTIVO -->
+  <!-- PÁGINA 1: RESUMO EXECUTIVO (DARK PREMIUM) -->
   <div class="pdf-page" id="page-1">
-    <div class="pdf-header">
-      <div>
-        <h1 class="pdf-title">EscorpiãoSafe</h1>
-        <p class="pdf-sub">Índice de Vulnerabilidade Residencial</p>
-      </div>
-      <div class="pdf-meta">
-        Data: <span id="pdf-date">--/--/----</span><br>
-        Protocolo: <span id="pdf-protocol">0000-0000</span>
-      </div>
-    </div>
+    <!-- Marca d'água -->
+    <div style="position:absolute; top:20%; right:-10%; width:500px; height:500px; opacity:0.02; background:url('data:image/svg+xml;utf8,<svg viewBox=\'0 0 100 100\' fill=\'%23ffffff\' xmlns=\'http://www.w3.org/2000/svg\'><path d=\'M50 0 C60 20 70 40 80 50 C70 60 60 80 50 100 C40 80 30 60 20 50 C30 40 40 20 50 0 Z\'/></svg>') no-repeat center center; pointer-events:none; z-index:0;"></div>
     
-    <h2 class="pdf-h2">1. Resumo Executivo</h2>
-    <div class="risk-card" id="pdf-risk-card">
-      <div>
-        <div class="risk-level" id="pdf-risk-level">CALCULANDO...</div>
-        <div style="font-size: 14px; max-width: 400px;" id="pdf-risk-desc">Analisando os dados da sua residência...</div>
+    <div style="position:relative; z-index:1;">
+      <div class="pdf-header">
+        <div>
+          <h1 class="pdf-title">EscorpiãoSafe</h1>
+          <p class="pdf-sub">Índice de Vulnerabilidade Residencial</p>
+        </div>
+        <div class="pdf-meta">
+          DATA: <span id="pdf-date">--/--/----</span><br>
+          PROT: <span id="pdf-protocol">0000-0000</span>
+        </div>
       </div>
-      <div class="risk-score" id="pdf-risk-score">00</div>
-    </div>
+      
+      <h2 class="pdf-h2">1. Resumo Executivo</h2>
+      <div class="risk-card" id="pdf-risk-card">
+        <div>
+          <div class="risk-level" id="pdf-risk-level">CALCULANDO...</div>
+          <div style="font-size: 15px; max-width: 400px; color:#9CA3AF;" id="pdf-risk-desc">Analisando os dados do scanner residencial...</div>
+        </div>
+        <div class="risk-score" id="pdf-risk-score">00</div>
+      </div>
 
-    <h3 class="pdf-h3">Top 3 Fatores de Maior Risco Encontrados:</h3>
-    <ul class="pdf-ul" id="pdf-top-risks">
-      <!-- JS Injects -->
-    </ul>
-    
-    <div class="pdf-footer">Documento gerado automaticamente - Página 1 de 5</div>
+      <h3 class="pdf-h3">Top 3 Fatores Críticos Detectados:</h3>
+      <ul class="pdf-ul" id="pdf-top-risks">
+        <!-- JS Injects -->
+      </ul>
+      
+      <div class="pdf-footer">Documento gerado automaticamente - Página 1 de 5</div>
+    </div>
   </div>
 
-  <!-- PÁGINA 2: MAPA DE CALOR -->
+  <!-- PÁGINA 2: MAPA DE CALOR (CLARO) -->
   <div class="pdf-page" id="page-2">
-    <h2 class="pdf-h2">2. Mapa de Calor (Vulnerabilidade por Cômodo)</h2>
-    <p style="font-size:14px; margin-bottom: 20px;">Este mapa aponta as áreas da sua casa que oferecem as condições mais favoráveis para entrada ou abrigo de escorpiões, baseado em suas respostas.</p>
+    <h2 class="pdf-h2">2. Mapa de Calor Preventivo</h2>
+    <p style="font-size:15px; margin-bottom: 25px; color:#4B5563;">Este mapa escaneado aponta as áreas da sua casa que oferecem as condições mais favoráveis para entrada ou abrigo de escorpiões.</p>
     
     <svg class="heatmap-svg" viewBox="0 0 600 440" xmlns="http://www.w3.org/2000/svg">
       <!-- Fundo -->
-      <rect x="6" y="6" width="588" height="428" rx="6" fill="#f0f0f0" />
+      <rect x="0" y="0" width="600" height="440" rx="12" fill="#1F2937" />
       
       <!-- Quintal -->
-      <rect id="svg-quintal" x="16" y="16" width="568" height="65" rx="4" class="svg-room" fill="#e0e0e0"/>
+      <rect id="svg-quintal" x="16" y="16" width="568" height="65" rx="4" class="svg-room" fill="#10B981" opacity="0.8"/>
       <text x="300" y="52" class="svg-label" text-anchor="middle">Quintal / Área Externa</text>
 
       <!-- Cozinha -->
-      <rect id="svg-cozinha" x="60" y="92" width="160" height="130" class="svg-room" fill="#e0e0e0"/>
+      <rect id="svg-cozinha" x="60" y="92" width="160" height="130" class="svg-room" fill="#F97316" opacity="0.8"/>
       <text x="140" y="162" class="svg-label" text-anchor="middle">Cozinha</text>
 
       <!-- Banheiro -->
-      <rect id="svg-banheiro" x="220" y="92" width="160" height="130" class="svg-room" fill="#e0e0e0"/>
+      <rect id="svg-banheiro" x="220" y="92" width="160" height="130" class="svg-room" fill="#EF4444" opacity="0.8"/>
       <text x="300" y="162" class="svg-label" text-anchor="middle">Banheiro</text>
 
       <!-- Lavanderia -->
-      <rect id="svg-lavanderia" x="380" y="92" width="160" height="130" class="svg-room" fill="#e0e0e0"/>
-      <text x="460" y="162" class="svg-label" text-anchor="middle">Lavanderia</text>
+      <rect id="svg-lavanderia" x="380" y="92" width="160" height="130" class="svg-room" fill="#1F2937" stroke="#4B5563"/>
+      <text x="460" y="162" fill="#9CA3AF" font-family="Archivo" font-size="18" font-weight="bold" text-anchor="middle">Lavanderia</text>
 
       <!-- Sala -->
-      <rect id="svg-sala" x="60" y="222" width="240" height="132" class="svg-room" fill="#e0e0e0"/>
+      <rect id="svg-sala" x="60" y="222" width="240" height="132" class="svg-room" fill="#10B981" opacity="0.8"/>
       <text x="180" y="293" class="svg-label" text-anchor="middle">Sala / Corredor</text>
 
       <!-- Quartos -->
-      <rect id="svg-quartos" x="300" y="222" width="240" height="132" class="svg-room" fill="#e0e0e0"/>
+      <rect id="svg-quartos" x="300" y="222" width="240" height="132" class="svg-room" fill="#F59E0B" opacity="0.8"/>
       <text x="420" y="293" class="svg-label" text-anchor="middle">Quartos</text>
 
       <!-- Garagem -->
-      <rect id="svg-garagem" x="16" y="365" width="568" height="60" rx="4" class="svg-room" fill="#e0e0e0"/>
+      <rect id="svg-garagem" x="16" y="365" width="568" height="60" rx="4" class="svg-room" fill="#EF4444" opacity="0.8"/>
       <text x="300" y="402" class="svg-label" text-anchor="middle">Garagem / Frente</text>
     </svg>
 
-    <div style="display:flex; justify-content:center; gap:20px; margin-top:20px; font-size:12px; font-weight:bold;">
-      <span style="color:#10B981;">■ Baixo (0-24)</span>
+    <div style="display:flex; justify-content:center; gap:25px; margin-top:25px; font-family:'Space Mono'; font-size:12px; font-weight:bold;">
+      <span style="color:#10B981;">■ Seguro (0-24)</span>
       <span style="color:#F59E0B;">■ Atenção (25-49)</span>
       <span style="color:#F97316;">■ Alto (50-74)</span>
       <span style="color:#EF4444;">■ Crítico (75-100)</span>
@@ -176,27 +197,27 @@
     <div class="pdf-footer">Documento gerado automaticamente - Página 2 de 5</div>
   </div>
 
-  <!-- PÁGINA 3: PLANO TÁTICO -->
+  <!-- PÁGINA 3: PLANO TÁTICO (CLARO) -->
   <div class="pdf-page" id="page-3">
     <h2 class="pdf-h2">3. Plano de Ação Tático</h2>
-    <p style="font-size:14px; margin-bottom: 25px;">Siga este cronograma exato para blindar a sua residência aos poucos, focando primeiro no que oferece maior risco imediato à sua família.</p>
+    <p style="font-size:15px; margin-bottom: 30px; color:#4B5563;">Siga este cronograma exato para blindar a sua residência aos poucos, focando primeiro no que oferece maior risco imediato à sua família.</p>
     
-    <h3 class="pdf-h3">🚨 Ação Imediata (Próximas 24 horas)</h3>
+    <h3 class="pdf-h3" style="color:#EF4444;">🚨 Ação Imediata (Próximas 24 horas)</h3>
     <ul class="pdf-ul" id="pdf-plan-24h"></ul>
 
-    <h3 class="pdf-h3">⚠️ Curto Prazo (Em até 7 dias)</h3>
+    <h3 class="pdf-h3" style="color:#F97316; margin-top:35px;">⚠️ Curto Prazo (Em até 7 dias)</h3>
     <ul class="pdf-ul" id="pdf-plan-7d"></ul>
 
-    <h3 class="pdf-h3">✅ Médio Prazo (Em até 30 dias)</h3>
+    <h3 class="pdf-h3" style="color:#10B981; margin-top:35px;">✅ Médio Prazo (Em até 30 dias)</h3>
     <ul class="pdf-ul" id="pdf-plan-30d"></ul>
     
     <div class="pdf-footer">Documento gerado automaticamente - Página 3 de 5</div>
   </div>
 
-  <!-- PÁGINA 4: RECOMENDAÇÕES POR CÔMODO -->
+  <!-- PÁGINA 4: RECOMENDAÇÕES POR CÔMODO (CLARO) -->
   <div class="pdf-page" id="page-4">
     <h2 class="pdf-h2">4. Dossiê por Cômodo</h2>
-    <p style="font-size:14px; margin-bottom: 25px;">O que fazer especificamente em cada área da sua casa, baseado nas vulnerabilidades estruturais identificadas.</p>
+    <p style="font-size:15px; margin-bottom: 25px; color:#4B5563;">O que fazer especificamente em cada área da sua casa, baseado nas vulnerabilidades estruturais identificadas pelo scanner.</p>
     
     <div id="pdf-room-cards">
       <!-- Injetado via JS -->
@@ -205,24 +226,24 @@
     <div class="pdf-footer">Documento gerado automaticamente - Página 4 de 5</div>
   </div>
 
-  <!-- PÁGINA 5: PROTOCOLO DE EMERGÊNCIA -->
+  <!-- PÁGINA 5: PROTOCOLO DE EMERGÊNCIA (CLARO) -->
   <div class="pdf-page" id="page-5">
     <h2 class="pdf-h2">5. Protocolo de Segurança e Emergência</h2>
-    <p style="font-size:14px; margin-bottom: 25px;">Imprima esta página e deixe em local visível (ex: geladeira). Em caso de acidentes, o tempo de resposta e a ação correta salvam vidas.</p>
+    <p style="font-size:15px; margin-bottom: 30px; color:#4B5563;">Imprima esta página e deixe em local visível (ex: geladeira). Em caso de acidentes, o tempo de resposta e a ação correta salvam vidas.</p>
     
-    <div style="background: #fff0f0; border: 1px solid #ffd2ce; padding: 25px; border-radius: 8px; margin-bottom: 20px;">
-      <h3 style="color:#d32f2f; margin-top:0;">O que fazer EM CASO DE PICADA:</h3>
-      <ol style="line-height: 1.8; margin-bottom:0;">
-        <li><strong>Lave o local:</strong> Limpe imediatamente com água e sabão.</li>
+    <div style="background: #fef2f2; border: 1px solid #fecaca; padding: 30px; border-radius: 12px; margin-bottom: 25px;">
+      <h3 style="color:#b91c1c; margin-top:0; font-family:'Archivo';">O que fazer EM CASO DE PICADA:</h3>
+      <ol style="line-height: 1.8; margin-bottom:0; color:#7f1d1d; font-size:15px;">
+        <li><strong>Lave o local:</strong> Limpe imediatamente apenas com água e sabão.</li>
         <li><strong>Vá para o Hospital:</strong> Procure a Unidade de Saúde mais próxima ou ligue para o SAMU (192) imediatamente, principalmente em casos envolvendo crianças menores de 10 anos ou idosos.</li>
         <li><strong>Mantenha a calma:</strong> A agitação acelera a absorção do veneno. Mantenha a vítima em repouso.</li>
         <li><strong>Compressa Morna:</strong> O uso de compressas mornas (e NÃO geladas) no local ajuda a aliviar a dor aguda.</li>
       </ol>
     </div>
 
-    <div style="background: #f5f5f5; border: 1px solid #ddd; padding: 25px; border-radius: 8px;">
-      <h3 style="color:#333; margin-top:0;">O que NÃO FAZER (Mitos perigosos):</h3>
-      <ul style="line-height: 1.8; margin-bottom:0;">
+    <div style="background: #f9fafb; border: 1px solid #e5e7eb; padding: 30px; border-radius: 12px;">
+      <h3 style="color:#111; margin-top:0; font-family:'Archivo';">O que NÃO FAZER (Mitos perigosos):</h3>
+      <ul style="line-height: 1.8; margin-bottom:0; color:#374151; font-size:15px;">
         <li><strong>NÃO faça torniquetes:</strong> Garrotes podem piorar o dano no membro afetado.</li>
         <li><strong>NÃO tente sugar o veneno:</strong> Furar, cortar, espremer ou chupar o local agrava a lesão e gera infecção.</li>
         <li><strong>NÃO aplique gelo:</strong> O frio intenso piora a dor provocada pelo veneno do escorpião.</li>
@@ -230,7 +251,7 @@
       </ul>
     </div>
     
-    <div style="margin-top:40px; font-size:11px; color:#999; text-align:justify;">
+    <div style="margin-top:50px; font-size:12px; color:#9CA3AF; text-align:justify; line-height:1.5;">
       <strong>Aviso Legal:</strong> Este relatório possui caráter puramente educativo e preventivo. Ele não substitui avaliações presenciais de profissionais de controle de pragas, tampouco orientações médicas oficiais. As orientações contidas neste material baseiam-se em recomendações de acesso público divulgadas pelo Ministério da Saúde e Secretarias de Saúde, visando promover o manejo ambiental seguro.
     </div>
 

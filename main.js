@@ -1,6 +1,6 @@
 import html2pdf from 'html2pdf.js';
 
-const QUIZ_URL   = "escorpiao.html";
+const QUIZ_URL   = "/escorpiao.html";
 const KIWIFY_URL = "https://pay.kiwify.com.br/SEU-CHECKOUT";
 document.querySelectorAll('.js-buy').forEach(a=>a.setAttribute('href', QUIZ_URL));
 document.getElementById('yr').textContent = new Date().getFullYear();
